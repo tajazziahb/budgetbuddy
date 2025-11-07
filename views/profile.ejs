@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>BudgetBuddy | Profile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
   <div class="profile-container">
     <header class="profile-header sticky-header anim-fadeUp">
@@ -22,7 +23,7 @@
 
     <main class="profile-content">
       <section class="account-section card card-compact sticky-card anim-fadeUp">
-        <h2 class="section-title">Account Details</h2>
+        <h2 class="section-title">Account</h2>
         <div class="account-info stack-8">
           <p><strong>ID:</strong>
             <%= user._id %>
@@ -45,23 +46,28 @@
                 <option value="income">Income</option>
               </select>
             </div>
+
             <div class="form-group">
               <label class="form-label">Amount</label>
               <input class="form-control" type="number" name="amount" step="0.01" min="0" required>
             </div>
+
             <div class="form-group">
               <label class="form-label">Category</label>
-              <input class="form-control" type="text" name="category" placeholder="e.g., groceries, rent, work"
+              <input class="form-control" type="text" name="category" placeholder="e.g., groceries, rent, phone"
                 required>
             </div>
+
             <div class="form-group">
-              <label class="form-label">Date</label>
+              <label class="form-label">Date of Transaction</label>
               <input class="form-control" type="date" name="date" required>
             </div>
-            <div class="form-group">
+
+            <div class="form-group form-group-wide">
               <label class="form-label">Note</label>
               <input class="form-control" type="text" name="note" placeholder="optional">
             </div>
+
             <button type="submit" class="submit-button">Add Transaction</button>
           </form>
         </div>
@@ -81,27 +87,50 @@
                 </tr>
               </thead>
               <tbody>
-                <% transactions.forEach(function(t){ %>
+                <% transactions.forEach(function(transaction){ %>
                   <tr>
                     <td>
-                      <%= new Date(t.date).toLocaleDateString() %>
+                      <%= new Date(transaction.date).toLocaleDateString('en-US') %>
                     </td>
-                    <td class="transaction-type">
-                      <%= t.type %>
+                    <td class="transaction-type cap">
+                      <%= transaction.type %>
                     </td>
-                    <td>
-                      <%= t.category %>
-                    </td>
-                    <td>
-                      <%= (Number(t.amount) || 0).toLocaleString(undefined, { style:'currency', currency:'USD' }) %>
+                    <td class="cap">
+                      <%= transaction.category %>
                     </td>
                     <td>
-                      <%= t.note %>
+                      <%= (Number(transaction.amount) || 0).toLocaleString(undefined,{style:'currency',currency:'USD'})
+                        %>
                     </td>
                     <td>
-                      <form class="inline-form" action="/transactions/<%= t._id %>/delete" method="POST">
-                        <button class="delete-button" type="submit">Delete</button>
-                      </form>
+                      <%= transaction.note %>
+                    </td>
+                    <td>
+                      <div class="row-actions">
+                        <details class="row-edit">
+                          <summary class="edit-button">Edit</summary>
+                          <form class="inline-form stack-8" action="/transactions/<%= transaction._id %>" method="POST">
+                            <select name="type" class="form-control" required>
+                              <option value="expense" <%=transaction.type==='expense' ? 'selected' : '' %>>Expense
+                              </option>
+                              <option value="income" <%=transaction.type==='income' ? 'selected' : '' %>>Income</option>
+                            </select>
+                            <input class="form-control" type="number" step="0.01" min="0" name="amount"
+                              value="<%= transaction.amount %>" required>
+                            <input class="form-control" type="text" name="category" value="<%= transaction.category %>"
+                              required>
+                            <input class="form-control" type="date" name="date"
+                              value="<%= transaction.date ? new Date(transaction.date).toISOString().slice(0,10) : '' %>"
+                              required>
+                            <input class="form-control" type="text" name="note" value="<%= transaction.note %>">
+                            <button class="submit-button small">Save</button>
+                          </form>
+                        </details>
+
+                        <form class="inline-form" action="/transactions/<%= transaction._id %>/delete" method="POST">
+                          <button class="delete-button" type="submit">Delete</button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                   <% }) %>
@@ -115,4 +144,5 @@
     </main>
   </div>
 </body>
+
 </html>
